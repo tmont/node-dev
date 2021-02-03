@@ -36,6 +36,7 @@ There are a couple of command line options that can be used to control which
 files are watched and what happens when they change:
 
 * `--clear` - Clear the screen on restart
+* `--debounce=<num>` - Wait `num` milliseconds before restarting the server when a file changes (default: `0`)
 * `--dedupe` - [Dedupe dynamically](https://www.npmjs.org/package/dynamic-dedupe)
 * `--deps`:
   * -1 - Watch the whole dependency tree
@@ -44,6 +45,7 @@ files are watched and what happens when they change:
 * `--fork` - Hook into child_process.fork
 * `--graceful_ipc <msg>` - Send 'msg' as an IPC message instead of SIGTERM for restart/shutdown
 * `--ignore` - A file whose changes should not cause a restart
+* `--log_uncaught` - Log uncaught errors to stderr (default: `true`)
 * `--notify` - Display desktop notifications
 * `--poll` - Force polling for file changes (Caution! CPU-heavy!)
 * `--respawn` - Keep watching for changes after the script has exited
@@ -86,11 +88,13 @@ Usually node-dev doesn't require any configuration at all, but there are some
 options you can set to tweak its behaviour:
 
 * `clear` – Whether to clear the screen upon restarts. _Default:_ `false`
+* `debounce` – Wait before restarting the server when a file changes. _Default:_ `0`
 * `dedupe` – Whether modules should by [dynamically deduped](https://www.npmjs.org/package/dynamic-dedupe). _Default:_ `false`
 * `deps` – How many levels of dependencies should be watched. _Default:_ `1`
 * `fork` – Whether to hook into [child_process.fork](http://nodejs.org/docs/latest/api/child_process.html#child_process_child_process_fork_modulepath_args_options) (required for [clustered](http://nodejs.org/docs/latest/api/cluster.html) programs). _Default:_ `true`
 * `graceful_ipc` - Send the argument provided as an IPC message instead of SIGTERM during restart events. _Default:_ `""` (off)
 * `ignore` - A single file or an array of files to ignore. _Default:_ `[]`
+* `log_uncaught` – Log uncaught errors to stderr. _Default:_ `true`
 * `notify` – Whether to display desktop notifications. _Default:_ `true`
 * `poll` - Force polling for file changes, this can be CPU-heavy. _Default:_ `false`
 * `respawn` - Keep watching for changes after the script has exited. _Default:_ `false`
@@ -210,6 +214,20 @@ This might be useful when you are running a [universal][universal-javascript]
 [React.js](react) components for server-side rendering, which you don’t want to trigger a
 server restart when changed, since it introduces an unnecessary delay.
 
+### Debounce
+If many files change in a short amount of time, or a subsequent restart is triggered
+while the process is still booting, it can occasionally cause errors (usually `EPIPE`
+or `ERR_IPC_CHANNEL_CLOSED`) unrelated to your program. Enabling a `debounce` can
+help to eliminate this class of errors.
+
+The following will wait until no changes were detected for 500ms before triggering
+a restart:
+
+```json
+{
+  "debounce": 500
+}
+```
 ## License
 
 MIT

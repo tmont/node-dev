@@ -282,3 +282,48 @@ tap.test('Supports --inspect', t => {
     }
   });
 });
+
+tap.test('Supports debouncing', t => {
+  spawn('--debounce=100 debounce.js', out => {
+    if (out.match(/Server listening on/)) {
+      touchFile('debounce-dep1.js');
+      touchFile('debounce-dep2.js');
+      touchFile('debounce-dep3.js');
+      return out2 => {
+        if (out2.match(/Restarting: .+ and 2 other files were modified/)) {
+          return { exit: t.end.bind(t) };
+        }
+      };
+    }
+  });
+});
+
+tap.test('should log uncaught errors if --log_uncaught is true', t => {
+  spawn('uncaught-exception-handler.js', out => {
+    // stack trace should still be there
+    t.match(out, 'at Object.');
+    t.match(out, 'at Module.');
+
+    return out2 => {
+      // error logging should still be there
+      t.match(out2, /\[ERROR] .+ ReferenceError:/);
+      return {
+        exit: t.end.bind(t)
+      };
+    };
+  });
+});
+
+tap.test('should not log uncaught errors if --log_uncaught is false', t => {
+  spawn('--log_uncaught=false uncaught-exception-handler.js', out => {
+    // ensure there are no stack traces present
+    t.notMatch(out, 'at Object.');
+    t.notMatch(out, 'at Module.');
+
+    // but error logging should still be there
+    t.match(out, /\[ERROR] .+ ReferenceError:/);
+    return {
+      exit: t.end.bind(t)
+    };
+  });
+});

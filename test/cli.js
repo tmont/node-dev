@@ -85,3 +85,52 @@ tap.test('-r coffeescript/register -r ts-node/register test/fixture/server.coffe
   t.deepEqual(nodeArgs, ['-r', 'coffeescript/register', '-r', 'ts-node/register']);
   t.done();
 });
+
+tap.test('log_uncaught is enabled by default', t => {
+  const { opts: { log_uncaught: logUncaught } } = cli(['node', 'bin/node-dev', 'test']);
+
+  t.is(logUncaught, true);
+  t.done();
+});
+
+tap.test('--no-log_uncaught', t => {
+  const { opts: { log_uncaught: logUncaught } } = cli(['node', 'bin/node-dev', '--no-log_uncaught', 'test']);
+
+  t.is(logUncaught, false);
+  t.done();
+});
+
+tap.test('--log_uncaught=false', t => {
+  const { opts: { log_uncaught: logUncaught } } = cli(['node', 'bin/node-dev', '--log_uncaught=false', 'test']);
+
+  t.is(logUncaught, false);
+  t.done();
+});
+
+tap.test('--log_uncaught', t => {
+  const { opts: { log_uncaught: logUncaught } } = cli(['node', 'bin/node-dev', '--log_uncaught', 'test']);
+
+  t.is(logUncaught, true);
+  t.done();
+});
+
+tap.test('--log_uncaught=true', t => {
+  const { opts: { log_uncaught: logUncaught } } = cli(['node', 'bin/node-dev', '--log_uncaught=true', 'test']);
+
+  t.is(logUncaught, true);
+  t.done();
+});
+
+tap.test('debounce is 0 by default', t => {
+  const { opts: { debounce } } = cli(['node', 'bin/node-dev', 'test']);
+
+  t.is(debounce, 0);
+  t.done();
+});
+
+tap.test('--debounce=1000', t => {
+  const { opts: { debounce } } = cli(['node', 'bin/node-dev', '--debounce=1000', 'test']);
+
+  t.is(debounce, 1000);
+  t.done();
+});
